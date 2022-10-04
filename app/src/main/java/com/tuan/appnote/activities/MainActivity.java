@@ -29,16 +29,17 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         setContentView(R.layout.activity_main);
         addControlls();
         addEvents();
-        getNotes();
+        getNotes(REQUEST_CODE_SHOW_NOTE);
     }
-
+    public static final int REQUEST_CODE_SHOW_NOTE = 3;
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     public static final int REQUEST_CODE_UPDATE_NOTE = 2;
     private ImageView imageViewAddNoteMain;
     private RecyclerView noteRecyclerView;
-    private List<Note> noteList = new ArrayList<>();
+    private final List<Note> noteList = new ArrayList<>();
     private NotesAdapter notesAdapter;
     private int noteClickedPosition = -1;
+
     private void addControlls()
     {
         imageViewAddNoteMain = findViewById(R.id.imageAddNoteMain);
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         startActivityForResult(intent, REQUEST_CODE_UPDATE_NOTE);
     }
 
-    private void getNotes()
+    private void getNotes(final int requestCode)
     {
         class GetNoteTask extends AsyncTask<Void, Void, List<Note>>
         {
@@ -71,17 +72,23 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
             @Override
             protected void onPostExecute(List<Note> notes) {
                 super.onPostExecute(notes);
-                if(noteList.size() == 0)
+                if(requestCode == REQUEST_CODE_SHOW_NOTE)
                 {
                     noteList.addAll(notes);
                     notesAdapter.notifyDataSetChanged();
                 }
-                else
-                {
-                    noteList.add(0,notes.get(0)); // list note k trống thì add note mới nhất vào list và thông báo mới cho adapter rồi cuộn view người xem lên đầu
-                    notesAdapter.notifyItemInserted(0);
-                }
-                noteRecyclerView.smoothScrollToPosition(0);
+                else if(requestCode == REQUEST_CODE_ADD_NOTE)
+                    {
+                        noteList.add(0,notes.get(0));
+                        notesAdapter.notifyItemInserted(0);
+                        noteRecyclerView.smoothScrollToPosition(0);
+                    }
+                else if(requestCode == REQUEST_CODE_UPDATE_NOTE)
+                        {
+                            noteList.remove(noteClickedPosition);
+                            noteList.add(noteClickedPosition, notes.get(noteClickedPosition));
+                            notesAdapter.notifyItemChanged(noteClickedPosition);
+                        }
             }
         }
         new GetNoteTask().execute();
@@ -105,7 +112,17 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK)
         {
-            getNotes();
+            getNotes(REQUEST_CODE_ADD_NOTE);
         }
+        else
+            if(requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == RESULT_OK)
+            {
+                if(data != null)
+                {
+                    getNotes(REQUEST_CODE_UPDATE_NOTE);
+                }
+            }
     }
+
+
 }

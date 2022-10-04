@@ -53,6 +53,7 @@ public class CreatNoteActivity extends AppCompatActivity {
         addEvents();
         initMiscellaneous();
         setSubtitleIndicatorColor();
+//        saveNotes();
     }
 
     private ImageView imageBack,imageView;
@@ -62,7 +63,7 @@ public class CreatNoteActivity extends AppCompatActivity {
     private String selectedNoteColor;
     private int REQUEST_CODE_PERMISSION = 1;
     private int REQUEST_SELECT_IMG = 2;
-    private ImageView imageViewNote;
+    private ImageView imageViewNote, imageRemoteWebURL, imageRemoveImage;
     private String selectImagePath;
     private TextView textWebURL;
     private LinearLayout layoutWebURL;
@@ -79,6 +80,8 @@ public class CreatNoteActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageSave);
         viewSubtitleIndicator = findViewById(R.id.viewSubtitleIndicator);
         imageViewNote = findViewById(R.id.imageNote);
+        imageRemoteWebURL = findViewById(R.id.imageRemoveWebURL);
+        imageRemoveImage = findViewById(R.id.imageRemoveImage);
 
         textDateTime.setText(new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm:a", Locale.getDefault()).format(new Date()));
         textWebURL = findViewById(R.id.textWebURL);
@@ -110,6 +113,24 @@ public class CreatNoteActivity extends AppCompatActivity {
             setViewOrUpdateNote();
         }
 
+        imageRemoteWebURL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                textWebURL.setText(null);
+                layoutWebURL.setVisibility(View.GONE);
+            }
+        });
+
+        imageRemoveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageRemoveImage.setImageBitmap(null);
+                imageViewNote.setVisibility(View.GONE);
+                imageRemoveImage.setVisibility(View.GONE);
+                selectImagePath = "";
+            }
+        });
+
     }
 
     private void setViewOrUpdateNote()
@@ -120,6 +141,14 @@ public class CreatNoteActivity extends AppCompatActivity {
         textDateTime.setText(alreadyAvailableNote.getDateTime());
 
         if(alreadyAvailableNote.getImagePath() != null && !alreadyAvailableNote.getImagePath().trim().isEmpty())
+        {
+            imageViewNote.setImageBitmap(BitmapFactory.decodeFile(alreadyAvailableNote.getImagePath()));
+            imageViewNote.setVisibility(View.VISIBLE);
+            imageRemoveImage.setVisibility(View.VISIBLE);
+            selectImagePath = alreadyAvailableNote.getImagePath();
+        }
+
+        if(alreadyAvailableNote.getWebLink() != null && !alreadyAvailableNote.getWebLink().trim().isEmpty())
         {
             textWebURL.setText(alreadyAvailableNote.getWebLink());
             layoutWebURL.setVisibility(View.VISIBLE);
@@ -152,6 +181,11 @@ public class CreatNoteActivity extends AppCompatActivity {
             if (layoutWebURL.getVisibility() == View.VISIBLE)
             {
                 note.setWebLink(textWebURL.getText().toString());
+            }
+
+            if(alreadyAvailableNote != null)
+            {
+                note.setId(alreadyAvailableNote.getId());
             }
 
             class saveNoteTask extends AsyncTask<Void, Void, Void>{ // AsyncTask dùng để xử lý Ui thread tốt hơn, thưc hiện tác vụ dài mà k ảnh hưởng đến main thread
@@ -296,10 +330,10 @@ public class CreatNoteActivity extends AppCompatActivity {
                 break;
 
                 case "#3A52FC": layoutMiscellaneous.findViewById(R.id.viewColor4).performClick();
-                    break;
+                break;
 
                 case "#000000": layoutMiscellaneous.findViewById(R.id.viewColor5).performClick();
-                    break;
+                break;
             }
         }
     }
@@ -319,7 +353,7 @@ public class CreatNoteActivity extends AppCompatActivity {
         }
     }
 
-    @Override   // xử lý kq bỏ xót
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == REQUEST_CODE_PERMISSION && grantResults.length > 0)
@@ -350,6 +384,7 @@ public class CreatNoteActivity extends AppCompatActivity {
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         imageViewNote.setImageBitmap(bitmap);
                         imageViewNote.setVisibility(View.VISIBLE);
+                        imageRemoveImage.setVisibility(View.VISIBLE);
 
                         selectImagePath = getPathFormUri(selectedImageUri);
                     }catch (Exception e)
