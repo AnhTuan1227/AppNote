@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.tuan.appnote.R;
@@ -39,11 +42,13 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
     private final List<Note> noteList = new ArrayList<>();
     private NotesAdapter notesAdapter;
     private int noteClickedPosition = -1;
+    private EditText inputSearch;
 
     private void addControlls()
     {
         imageViewAddNoteMain = findViewById(R.id.imageAddNoteMain);
         noteRecyclerView = findViewById(R.id.notesRecyclerView);
+        inputSearch = findViewById(R.id.inputSearch);
 
         noteRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
 
@@ -111,6 +116,26 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
                            new Intent(getApplicationContext(), CreatNoteActivity.class),
                            REQUEST_CODE_ADD_NOTE
                    );
+                }
+            });
+
+            inputSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    notesAdapter.cancelTime();
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    if (noteList.size() != 0)
+                    {
+                        notesAdapter.searchNote(editable.toString());
+                    }
                 }
             });
         }
