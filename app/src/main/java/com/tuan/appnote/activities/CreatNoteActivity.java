@@ -53,6 +53,7 @@ public class CreatNoteActivity extends AppCompatActivity {
         addEvents();
         initMiscellaneous();
         setSubtitleIndicatorColor();
+        quickActions();
     }
 
     private ImageView imageBack,imageView;
@@ -131,6 +132,24 @@ public class CreatNoteActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void quickActions()
+    {
+        if(getIntent().getBooleanExtra("isFromQuickActions",false))
+        {
+            String type = getIntent().getStringExtra("quickActionType");
+            if(type != null)
+            {
+                if (type.equals("image"))
+                {
+                    selectImagePath = getIntent().getStringExtra("imagePath");
+                    imageViewNote.setImageBitmap(BitmapFactory.decodeFile(selectImagePath));
+                    imageViewNote.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageRemoveImage).setVisibility(View.VISIBLE);
+                }
+            }
+        }
     }
 
     private void setViewOrUpdateNote()
