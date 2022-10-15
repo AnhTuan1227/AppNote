@@ -148,6 +148,12 @@ public class CreatNoteActivity extends AppCompatActivity {
                     imageViewNote.setVisibility(View.VISIBLE);
                     findViewById(R.id.imageRemoveImage).setVisibility(View.VISIBLE);
                 }
+                else
+                    if(type.equals("URL"))
+                    {
+                        textWebURL.setText(getIntent().getStringExtra("URL"));
+                        layoutWebURL.setVisibility(View.VISIBLE);
+                    }
             }
         }
     }

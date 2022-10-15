@@ -9,17 +9,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
     private int noteClickedPosition = -1;
     private EditText inputSearch;
     private ImageView imageAddNote, imageAddImage, imageAddWebLink;
+    private AlertDialog dialogAddURL;
 
     private void addControlls()
     {
@@ -178,6 +183,13 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
                     }
                 }
             });
+
+            imageAddWebLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showAddURLDialog();
+                }
+            });
         }
 
     @Override
@@ -260,5 +272,56 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         {
             startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
         }
+    }
+
+    private void showAddURLDialog() {
+        android.app.AlertDialog.Builder builder = null;
+        View view = null;
+        if (dialogAddURL == null) {
+            builder = new android.app.AlertDialog.Builder(MainActivity.this);
+            view = LayoutInflater.from(this).inflate(R.layout.layout_add_url, (ViewGroup) findViewById(R.id.layoutAddUrlContainer));
+            builder.setView(view);
+
+            dialogAddURL = builder.create();
+            if(dialogAddURL.getWindow() != null)
+            {
+                dialogAddURL.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+
+            final EditText inputURL = view.findViewById(R.id.inputURL);
+            inputURL.requestFocus();
+
+            view.findViewById(R.id.textAdd).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(inputURL.getText().toString().trim().isEmpty())
+                    {
+                        Toast.makeText(MainActivity.this, "Nhập URL", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    if (!Patterns.WEB_URL.matcher(inputURL.getText().toString()).matches())
+                    {
+                        Toast.makeText(MainActivity.this, "Nhập URL hợp lệ", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        dialogAddURL.dismiss(); // đóng dialog
+                        Intent intent = new Intent(getApplicationContext(),CreatNoteActivity.class);
+                        intent.putExtra("isFromQuickActions",true);
+                        intent.putExtra("quickActionType","URL");
+                        intent.putExtra("URL",inputURL.getText().toString());
+                        startActivityForResult(intent, REQUEST_CODE_ADD_NOTE);
+                    }
+                }
+            });
+
+            view.findViewById(R.id.textCancel).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogAddURL.dismiss();
+                }
+            });
+        }
+        dialogAddURL.show();
     }
 }
