@@ -17,7 +17,7 @@
         android:fontFamily="@font/a"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="Khác"
+        android:text="Miscellaneous"
         android:textColor="@color/white"
         android:textSize="@dimen/_13ssp"/>
     
@@ -136,7 +136,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/a"
             android:includeFontPadding="false"
-            android:text="Chọn màu"
+            android:text="Color"
             android:textColor="@color/white"
             android:textSize="@dimen/_13ssp"/>
 
@@ -163,7 +163,7 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:fontFamily="@font/a"
             android:includeFontPadding="false"
-            android:text="Thêm Ảnh"
+            android:text="Add Image"
             android:textColor="@color/colorIcons"
             android:textSize="@dimen/_12ssp"/>
 
